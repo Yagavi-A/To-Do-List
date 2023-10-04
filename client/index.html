@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>User Login and Signup</title>
+  <link rel="stylesheet" type="text/css" href="index.css">
+</head>
+<body>
+  <div id="loginForm">
+    <h2>User Login</h2>
+    <div class="login-container">
+    <form>
+      <div>
+        <label for="loginEmail">Email:</label>
+        <input type="email" id="loginEmail" placeholder="Enter Email">
+      </div>
+      <div>
+        <label for="loginPassword">Password:</label>
+        <input type="password" id="loginPassword" placeholder="Enter Password">
+      </div>
+      <button type="button" onclick="login()">Login</button>
+    </form>
+    <p>New User? <a href="#" onclick="showSignup()">Signup</a></p>
+  </div>
+</div>
+
+  <div id="signupForm" style="display: none;">
+    <h2>User Signup</h2>
+    <div class="signup-container">
+    <form>
+      <div>
+        <label for="uID">ID:</label>
+        <input type="text" id="uID" placeholder="Enter ID">
+      </div>
+      <div>
+        <label for="uName">Name:</label>
+        <input type="text" id="uName" placeholder="Enter Name">
+      </div>
+      <div>
+        <label for="uEmail">Email:</label>
+        <input type="email" id="uEmail" placeholder="Enter Email">
+      </div>
+      <div>
+        <label for="uPassword">Password:</label>
+        <input type="password" id="uPassword" placeholder="Enter Password">
+      </div>
+      <button type="button" onclick="signup()">Signup</button>
+    </form>
+    <p>Already have an account? <a href="#" onclick="showLogin()">Login</a></p>
+  </div>
+  </div>
+
+  <script>
+    function showSignup() {
+      document.getElementById('loginForm').style.display = 'none';
+      document.getElementById('signupForm').style.display = 'block';
+    }
+
+    function showLogin() {
+      document.getElementById('signupForm').style.display = 'none';
+      document.getElementById('loginForm').style.display = 'block';
+    }
+
+    function signup() {
+  const uID = document.getElementById('uID').value;
+  const uName = document.getElementById('uName').value;
+  const uEmail = document.getElementById('uEmail').value;
+  const uPassword = document.getElementById('uPassword').value;
+
+  const newUser = {
+    uID,
+    uName,
+    uEmail,
+    uPassword
+  };
+
+  // Send the newUser object to your server for signup using an HTTP request (e.g., fetch or axios)
+  // Replace 'YOUR_SERVER_ENDPOINT' with the actual endpoint to handle signup
+  fetch('http://localhost:5001/api/v1/user/signup', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(newUser)
+  })
+  .then(response => {if (response.status == 200) window.location.href="/list.html"})
+  .catch(error => console.error('Error:', error));
+
+}
+
+function login() {
+  const email = document.getElementById('uEmail').value;
+  const password = document.getElementById('uPassword').value;
+
+  const userCredentials = {
+    email,
+    password
+  };
+
+  // Send the userCredentials object to your server for login using an HTTP request (e.g., fetch or axios)
+  // Replace 'YOUR_SERVER_ENDPOINT' with the actual endpoint to handle login
+  fetch('http://localhost:5001/api/v1/user/login', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(userCredentials)
+  })
+  .then(response =>window.location.href = "/list.html")
+  .catch(error => console.error('Error:', error));
+}
+
+  </script>
+</body>
+</html>

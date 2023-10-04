@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Todo List App</title>
+  <link rel="stylesheet" href="list.css">
+</head>
+<body>
+  <h1>Create Todo</h1>
+  <form id="todoForm">
+    <input id="id" hidden="true">
+    <label for="Name">Name:</label>
+    <input type="text" id="Name" name="Name" required><br><br>
+
+    <label for="Category">Category:</label>
+    <input type="text" id="Category" name="Category" required><br><br>
+
+    <label for="Description">Description:</label>
+    <input type="text" id="Description" name="Description" required><br><br>
+
+    <label for="Deadline">Deadline:</label>
+    <input type="text" id="Deadline" name="Deadline" required><br><br>
+
+    <button type="submit">Create Todo</button>
+  </form>
+  <button onclick="update()">Update Todo</button>
+  <h1>Todo Lists</h1>
+  <ul id="todoList"></ul>
+
+  <script>
+    const todoForm = document.getElementById('todoForm');
+    const todoList = document.getElementById('todoList');
+
+    const renderTodoList = (todo) => {
+      const listItem = document.createElement('li');
+      listItem.innerText = `Name: ${todo.Name}, Category: ${todo.Category}, Description: ${todo.Description}, Deadline: ${todo.Deadline}`;
+
+      const editButton = document.createElement('button');
+      editButton.innerText = 'Edit';
+      editButton.addEventListener('click', () => editTodoList(todo._id));
+
+      const deleteButton = document.createElement('button');
+      deleteButton.innerText = 'Delete';
+      deleteButton.addEventListener('click', () => deleteTodoList(todo._id));
+
+      listItem.appendChild(editButton);
+      listItem.appendChild(deleteButton);
+
+      todoList.appendChild(listItem);
+    };
+
+    const fetchTodoLists = () => {
+      fetch('http://localhost:5001/api/v1/list/all')
+        .then(response => response.json())
+        .then(data => {
+          todoList.innerHTML = '';  // Clear previous entries
+          data.forEach(todo => renderTodoList(todo));
+        })
+        .catch(error => console.error('Error fetching todo lists:', error));
+    };
+
+    const editTodoList = (id) => {
+  fetch(`http://localhost:5001/api/v1/list/readOneList/${id}`)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return response.json();
+    })
+    .then(data => {
+      // Pre-fill the form fields with the todo item's details
+      document.getElementById("id").value = data._id
+      document.getElementById('Name').value = data.Name;
+      document.getElementById('Category').value = data.Category;
+      document.getElementById('Description').value = data.Description;
+      document.getElementById('Deadline').value = data.Deadline;
+    })
+    .catch(error => console.error('Error fetching todo for editing:', error));
+};
+    function update(){
+      const id = document.getElementById("id").value
+      const Name = document.getElementById('Name').value;
+      const Category = document.getElementById('Category').value;
+      const Description = document.getElementById('Description').value;
+      const Deadline = document.getElementById('Deadline').value;
+      const todoData = { Name, Category, Description, Deadline };
+      fetch(`http://localhost:5001/api/v1/list/update/${id}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(todoData)
+      })
+        .then(response => response.json())
+        .then(data => {
+          console.log('Todo created:', data);
+          alert('Todo updated successfully!');
+
+          document.getElementById('Name').value = '';
+          document.getElementById('Category').value = '';
+          document.getElementById('Description').value = '';
+          document.getElementById('Deadline').value = '';
+
+          fetchTodoLists();
+        })
+        .catch(error => console.error('Error creating todo:', error));
+
+    }
+
+
+    const deleteTodoList = (id) => {
+      fetch(`http://localhost:5001/api/v1/list/${id}`, {
+        method: 'DELETE'
+      })
+        .then(response => response.json())
+        .then(data => {
+          console.log('Todo deleted:', data);
+          alert('Todo deleted successfully!');
+          fetchTodoLists();  // Fetch and render updated todo list after deleting a todo
+        })
+        .catch(error => console.error('Error deleting todo:', error));
+    };
+
+    todoForm.addEventListener('submit', function(event) {
+      event.preventDefault();
+
+      const Name = document.getElementById('Name').value;
+      const Category = document.getElementById('Category').value;
+      const Description = document.getElementById('Description').value;
+      const Deadline = document.getElementById('Deadline').value;
+
+      const todoData = { Name, Category, Description, Deadline };
+
+      fetch('http://localhost:5001/api/v1/list/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(todoData)
+      })
+        .then(response => response.json())
+        .then(data => {
+          console.log('Todo created:', data);
+          alert('Todo created successfully!');
+
+          document.getElementById('Name').value = '';
+          document.getElementById('Category').value = '';
+          document.getElementById('Description').value = '';
+          document.getElementById('Deadline').value = '';
+
+          fetchTodoLists();
+        })
+        .catch(error => console.error('Error creating todo:', error));
+    });
+
+    fetchTodoLists();
+  </script>
+</body>
+</html>
