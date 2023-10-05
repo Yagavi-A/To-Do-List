@@ -73,8 +73,7 @@
     uPassword
   };
 
-  // Send the newUser object to your server for signup using an HTTP request (e.g., fetch or axios)
-  // Replace 'YOUR_SERVER_ENDPOINT' with the actual endpoint to handle signup
+  
   fetch('http://localhost:5001/api/v1/user/signup', {
     method: 'POST',
     headers: {
@@ -96,8 +95,7 @@ function login() {
     password
   };
 
-  // Send the userCredentials object to your server for login using an HTTP request (e.g., fetch or axios)
-  // Replace 'YOUR_SERVER_ENDPOINT' with the actual endpoint to handle login
+ 
   fetch('http://localhost:5001/api/v1/user/login', {
     method: 'POST',
     headers: {
